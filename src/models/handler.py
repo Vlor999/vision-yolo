@@ -15,7 +15,17 @@ def get_model(
     verbose: bool = True,
     device: str = "mps",
 ) -> YOLO:
-    """Load a YOLO model and move it to the specified device."""
+    """Load a YOLO model and move it to the specified device.
+
+    Args:
+        model_name: Path to the YOLO model file.
+        task: Task type for the model (e.g., 'detect', 'segment').
+        verbose: Whether to print verbose output during model loading.
+        device: Device to load the model on ('cpu', 'cuda', 'mps').
+
+    Returns:
+        The loaded YOLO model instance.
+    """
     model = YOLO(model=model_name, task=task, verbose=verbose)
     model.to(device)
     logger.info(f"Model loaded on device: {device}")
@@ -28,7 +38,14 @@ def draw_label(
     position: tuple[int, int],
     color: tuple[int, int, int] = (0, 255, 0),
 ) -> None:
-    """Draw a label with background on the frame."""
+    """Draw a label with background on the frame.
+
+    Args:
+        frame: The image frame to draw on.
+        label: The text label to display.
+        position: The (x, y) position to place the label.
+        color: The BGR color tuple for the label background.
+    """
     x, y = position
     (text_width, text_height), _ = cv.getTextSize(
         label, cv.FONT_HERSHEY_SIMPLEX, 0.5, 1

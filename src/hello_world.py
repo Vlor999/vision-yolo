@@ -2,5 +2,9 @@
 
 
 def hello_world() -> None:
-    """Says hello to the world."""
+    """Print a hello world message to the console.
+
+    This is a simple example function that demonstrates basic
+    function documentation and testing practices.
+    """
     print("Hello World!")
