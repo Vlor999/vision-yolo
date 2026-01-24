@@ -4,8 +4,15 @@ version = "0.1.0"
 description = "Vision project that does use YOLO models"
 authors = ["Willem Adnet <willem.adnet@grenoble-inp.org>"]
 readme = "README.md"
-requires-python = "==3.11.6"
+requires-python = ">=3.13"
 dependencies = [
+    "loguru>=0.7.3",
+    "mlx>=0.30.3",
+    "mlx-lm>=0.29.1",
+    "numpy>=2.4.1",
+    "opencv-python>=4.13.0.90",
+    "ruff>=0.14.14",
+    "ultralytics>=8.4.7",
 ]
 
 [dependency-groups]
