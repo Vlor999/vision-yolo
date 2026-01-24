@@ -1,0 +1,16 @@
+{
+  "generator-sicarator": {
+    "promptValues": {
+      "authorName": "Willem Adnet",
+      "authorEmail": "willem.adnet@grenoble-inp.org",
+      "ci": ".github",
+      "includeApi": false,
+      "includeDvc": false,
+      "includeStreamlit": false,
+      "includeHelloWorld": true
+    },
+    "projectName": "vision_yolo",
+    "projectSlug": "visionyolo",
+    "projectDescription": "Vision project that does use YOLO models"
+  }
+}
