@@ -134,6 +134,7 @@ def process_image(
     previous_boxes: list[tuple[int, int, int, int, int]] | None = None,
     verbose: bool = False,
     reduction_coefs: tuple[int | float, int | float] = (2, 2),
+    confidence_threshold: float = 0.6,
 ) -> np.ndarray:
     """Process an image with the YOLO model and draw detections."""
     if len(reduction_coefs) != 2 or any(
@@ -174,6 +175,8 @@ def process_image(
 
         for i in range(len(boxes)):
             conf = float(confs[i])
+            if conf < confidence_threshold:
+                continue
             cls = classes[i]
             class_name = names[cls]
 

@@ -81,8 +81,6 @@ def create_default_window(window_name: str, model: YOLO, delay: int = 20) -> Non
     """
     no_key = False
     cam = VideoStream(index=0).start()
-    frame_width = int(cam.get(cv.CAP_PROP_FRAME_WIDTH))
-    frame_height = int(cam.get(cv.CAP_PROP_FRAME_HEIGHT))
     cv.namedWindow(window_name)
     while True:
         tic = time()
