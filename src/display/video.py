@@ -13,13 +13,14 @@ def create_default_window(window_name: str, model: YOLO, delay: int = 20) -> Non
     """Create the default window."""
     no_key = False
     cam = cv.VideoCapture(0)
-    frame_width = int(cam.get(cv.CAP_PROP_FRAME_WIDTH))
-    frame_height = int(cam.get(cv.CAP_PROP_FRAME_HEIGHT))
     cv.namedWindow(window_name)
     while True:
         tic = time()
-        _, frame = cam.read()
-        frame = cv.resize(frame, (frame_width // 2, frame_height // 2))
+        ret, frame = cam.read()
+        if not ret:
+            logger.warning("Frame not captured")
+            break
+        fliped_frame = cv.flip(frame, 1)
         key = cv.waitKey(delay=delay)
         if key == ord("q"):
             no_key = False
@@ -39,13 +40,13 @@ def create_default_window(window_name: str, model: YOLO, delay: int = 20) -> Non
             logger.info(f"Key not handled: {chr(key)}")
             no_key = False
 
-        frame = process_image(model, frame)
+        image = process_image(model, fliped_frame)
         tac = time()
         fps = round(1 / (tac - tic), 1)
 
         fps_text = f"FPS: {fps}"
         cv.putText(
-            frame,
+            image,
             fps_text,
             (10, 30),
             cv.FONT_HERSHEY_SIMPLEX,
@@ -55,6 +56,6 @@ def create_default_window(window_name: str, model: YOLO, delay: int = 20) -> Non
             cv.LINE_AA,
         )
 
-        cv.imshow(winname=window_name, mat=frame)
+        cv.imshow(winname=window_name, mat=image)
     cam.release()
     cv.destroyWindow(window_name)
