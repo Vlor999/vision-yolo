@@ -12,7 +12,7 @@ def main() -> None:
     """
     device = "mps"
     model = get_model(model_name="./models/yolo26n.pt", task=None, device=device)
-    create_default_window("test", model)
+    create_default_window("YOLO - Object Detection", model)
 
 
 if __name__ == "__main__":

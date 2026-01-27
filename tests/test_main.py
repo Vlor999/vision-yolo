@@ -16,4 +16,4 @@ def test_main(mock_get_model, mock_create_window) -> None:
     mock_get_model.assert_called_once_with(
         model_name="./models/yolo26n.pt", task=None, device="mps"
     )
-    mock_create_window.assert_called_once_with("test", "fake_model")
+    mock_create_window.assert_called_once_with("YOLO - Object Detection", "fake_model")
