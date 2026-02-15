@@ -9,7 +9,7 @@ import numpy as np
 from loguru import logger
 from ultralytics.models import YOLO
 
-from src.models.embedding import match_boxes_embedding
+from src.models.embedding import EmbeddingDict, match_boxes_embedding
 
 # =============================================================================
 # Type Aliases
@@ -196,7 +196,7 @@ def _draw_aabb_box(
 
 def draw_boxes(
     matrix: cv.typing.MatLike,
-    boxes: BoxesPerCategory,
+    boxes: BoxesPerCategory | dict[str, list[tuple[Points, float, str | None]]],
     *,
     is_obb: bool = False,
     color: tuple[int, int, int] = (0, 255, 0),
@@ -205,15 +205,19 @@ def draw_boxes(
 
     Args:
         matrix: The image to draw on.
-        boxes: Dictionary mapping category names to list of (points, confidence).
+        boxes: Dictionary mapping category names to list of
+            ``(points, confidence)`` or ``(points, confidence, label)``.
         is_obb: Whether the boxes are oriented bounding boxes.
         color: BGR color tuple for the boxes.
     """
     draw_fn = _draw_obb_box if is_obb else _draw_aabb_box
 
     for category, category_boxes in boxes.items():
-        for points, confidence in category_boxes:
-            label = f"{category}: {confidence:.2f}"
+        for entry in category_boxes:
+            points, confidence = entry[0], entry[1]
+            matched_label: str | None = entry[2] if len(entry) > 2 else None
+            display = matched_label if matched_label else category
+            label = f"{display}: {confidence:.2f}"
             draw_fn(matrix, points, label, color)
 
 
@@ -443,7 +447,7 @@ def process_image(
     *,
     task: str = "detection",
     device: str | None = "mps",
-    embedding: dict[Any, Any] | None = None,
+    embedding: EmbeddingDict | None = None,
     verbose: bool = False,
     reduction_coefs: tuple[int | float, int | float] = (2, 2),
     confidence_threshold: float = 0.6,
@@ -456,6 +460,8 @@ def process_image(
         task: Task type ('detection' or 'obb').
         device: Device for inference. None for CoreML (auto Neural Engine).
         embedding: Optional embedding dictionary for object matching.
+            Build one with :func:`~src.models.embedding.build_embedding_from_directory`
+            or :func:`~src.models.embedding.update_embedding`.
         verbose: Whether to print verbose output.
         reduction_coefs: Factors to reduce image size for faster inference.
         confidence_threshold: Minimum confidence for detections.
@@ -467,9 +473,6 @@ def process_image(
     scale = _validate_reduction_coefs(reduction_coefs)
     if scale is None:
         return matrix
-
-    if embedding is None:
-        embedding = {}
 
     is_obb = task == "obb"
 
@@ -492,11 +495,12 @@ def process_image(
         is_obb=is_obb,
     )
 
-    # Apply NMS and embedding matching
     boxes = apply_nms(boxes, is_obb=is_obb)
-    boxes = match_boxes_embedding(boxes, embedding)
 
-    # Draw results
-    draw_boxes(matrix, boxes, is_obb=is_obb)
+    if embedding is not None:
+        matched_boxes = match_boxes_embedding(boxes, embedding, matrix)
+        draw_boxes(matrix, matched_boxes, is_obb=is_obb)
+    else:
+        draw_boxes(matrix, boxes, is_obb=is_obb)
 
     return matrix

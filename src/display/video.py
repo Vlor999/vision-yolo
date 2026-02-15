@@ -10,6 +10,7 @@ import numpy as np
 from loguru import logger
 from ultralytics.models import YOLO
 
+from src.models.embedding import build_embedding_from_directory
 from src.models.handler import process_image
 
 
@@ -206,6 +207,7 @@ def create_default_window(
         save_dir: Directory where the model is saved for display purposes.
         task: Task type for detection ('detection' or 'obb').
     """
+    embedding = build_embedding_from_directory()
     no_key = False
     cam = VideoStream(index=0).start()
     cv.namedWindow(window_name)
@@ -249,6 +251,7 @@ def create_default_window(
             model,
             fliped_frame,
             device=device,
+            embedding=embedding,
             reduction_coefs=(5, 3),
             task=task,
         )
@@ -265,7 +268,6 @@ def create_default_window(
             additional_info=additional_info,
         )
 
-        # Log performance metrics periodically (every 100 frames)
         if len(metrics) % 100 == 0 and len(metrics) > 0:
             avg_time = sum(fps_times) / len(fps_times)
             fps = round(1 / avg_time, 1) if avg_time > 0 else 0.0
